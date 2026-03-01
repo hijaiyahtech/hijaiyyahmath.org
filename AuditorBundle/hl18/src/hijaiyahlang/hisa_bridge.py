@@ -48,10 +48,33 @@ def index_of_letter(letter_id: str) -> int:
         raise TrapError(f"TRAP: letter_id not in normative 28: {letter_id!r}") from e
 
 def write_master_overlay_28(ds: HL18Dataset, word_v18: Vector18, out_csv: Path) -> None:
-    lines = []
+    # HISA-VM expects specific columns (COLS_INT from master.py)
+    # letter, ThetaHat, nt, nf, nm, km, kt, kd, ka, kz, qa, qt, qd, qs, qz, U, rho, AN, AK, AQ, hamzah_marker
+    header = "letter,ThetaHat,nt,nf,nm,km,kt,kd,ka,kz,qa,qt,qd,qs,qz,U,rho,AN,AK,AQ,hamzah_marker"
+    lines = [header]
+
     for i, lid in enumerate(NORMATIVE_28):
         v = word_v18 if i == 0 else ds.require(lid)
-        lines.append(lid + "," + ",".join(str(x) for x in v))
+        # v is (ThetaHat, nt, nf, nm, km, kt, kd, ka, kz, qa, qt, qd, qs, qz, AN, AK, AQ, hamzah_marker)
+        # Index map for v (v18):
+        # 0: ThetaHat, 1: nt, 2: nf, 3: nm, 4: km, 5: kt, 6: kd, 7: ka, 8: kz, 9: qa, 10: qt, 11: qd, 12: qs, 13: qz, 14: AN, 15: AK, 16: AQ, 17: hamzah_marker
+        
+        # Calculate derived U and rho
+        kz = v[8]
+        qt, qd, qs, qz = v[10], v[11], v[12], v[13]
+        u_val = qt + 4*qd + qs + qz + 2*kz
+        rho_val = v[0] - u_val
+        
+        # Build full row:
+        # letter(lid), v[0..13], U, rho, v[14..17]
+        row_cells = [lid]
+        row_cells.extend(str(x) for x in v[:14])
+        row_cells.append(str(u_val))
+        row_cells.append(str(rho_val))
+        row_cells.extend(str(x) for x in v[14:])
+        
+        lines.append(",".join(row_cells))
+        
     out_csv.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 class HISAVMRunner:
@@ -128,58 +151,58 @@ class HISAVMRunner:
             )
 
         text = cp_run.stdout.decode("utf-8", "replace").strip()
+        if not text:
+             raise ConformanceError(
+                f"HISA-VM returned no output!\nrc={cp_run.returncode}\ncmd={run_cmd}\nstderr={cp_run.stderr.decode('utf-8','replace')}"
+             )
         return self._parse_text(text)
 
     def _parse_text(self, text: str) -> HisaAuditResult:
-        status = None
-        regs: Dict[str, int] = {}
+        import json
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError as e:
+            raise ConformanceError(f"HISA-VM output not valid JSON: {text}") from e
+
+        status_obj = data.get("status", {})
+        state = status_obj.get("state")
+        
+        if state is None:
+            raise ConformanceError("HISA-VM output missing 'status.state'")
+
+        ok = (state == "HALT")
+        trap_msg = status_obj.get("msg")
+        trap_full = None
         trap_code = None
         trap_name = None
-        trap_full = None
-        audit_res = None
 
-        for line in text.splitlines():
-            m = _STATUS_RE.match(line)
-            if m:
-                status = m.group("status")
-                continue
-            m = _REGS_RE.match(line)
-            if m:
-                regs = _parse_regs_kv(m.group("regs"))
-                continue
-            m = _TRAP_RE.match(line)
-            if m:
-                trap_code = int(m.group("code"))
-                trap_name = m.group("name")
-                trap_full = f"TRAP({trap_code}) {trap_name}"
-                continue
-            m = _AUDIT_RE.match(line)
-            if m:
-                audit_res = m.group("res")
-                continue
+        if not ok:
+            # Parse trap message if it exists
+            # e.g., "TRAP(5) CORE1_REQUIRED ..."
+            if trap_msg:
+                m = re.match(r"^TRAP\((\d+)\)\s+([A-Z0-9_]+)", trap_msg)
+                if m:
+                    trap_code = int(m.group(1))
+                    trap_name = m.group(2)
+                    trap_full = f"TRAP({trap_code}) {trap_name}"
+                else:
+                    trap_full = trap_msg
+            else:
+                raise ConformanceError("Inconsistent TRAP: TRAP state but msg missing")
 
-        if status is None:
-            raise ConformanceError("HISA-VM output missing 'Status:'")
+        err_val = status_obj.get("err", 0)
+        regs = {"ERR": err_val, "CLOSED_HINT": data.get("CLOSED_HINT", 0)}
 
-        if status == "HALT_SUCCESS":
-            ok = True
-        elif status == "TRAP_TRIGGERED":
-            ok = False
-        else:
-            raise ConformanceError(f"Unknown HISA-VM Status: {status!r}")
-
-        err = regs.get("ERR", 0)
-        if ok and (err != 0 or trap_full is not None):
-            raise ConformanceError("Inconsistent PASS: HALT_SUCCESS but ERR/TRAP present")
-        if (not ok) and trap_full is None:
-            raise ConformanceError("Inconsistent TRAP: TRAP_TRIGGERED but Trap Code missing")
+        if ok and err_val != 0:
+            raise ConformanceError("Inconsistent PASS: HALT state but err != 0")
 
         return HisaAuditResult(
             ok=ok,
-            status=status,
+            status=state,
             trap=trap_full,
             trap_code=trap_code,
             trap_name=trap_name,
             registers=regs,
-            details={"raw": text, "audit_result_line": audit_res},
+            details={"raw": text},
         )
+

@@ -1,0 +1,10 @@
+hisa:
+  asm_cmd: ["python", "hisa-vm/tools/hisa-asm.py"]
+  run_cmd: ["python", "hisa-vm/tools/hisa-run.py", "--hij28", "hisa-vm/data/HIJAIYYAH_28.txt"]
+  source_ext: ".hisaasm"
+  program_template: |
+    ; HL18 -> HISA-VM audit program
+    LDH_V18 V0, {INDEX}
+    SETFLAG CLOSED_HINT, {CLOSED_HINT}
+    AUDIT V0
+    HALT

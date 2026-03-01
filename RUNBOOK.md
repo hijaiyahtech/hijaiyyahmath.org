@@ -1,4 +1,4 @@
-# RUNBOOK — Hijaiyah-Codex Operations
+# RUNBOOK — Hijaiyyah-Codex Operations
 
 ## 1. Environment Setup
 
@@ -26,7 +26,7 @@ python scripts/run_all.py
 ```
 
 ## 2. Forensic Auditing
-To audit the AI performance:
+To audit the AI performance (HGSS/HCVM):
 1. Ensure `LLM_API_KEY` is in `.env`.
 2. Run `make demo`.
 3. Inspect `reports/ab_report.json` and forensic logs in `artifacts/runs/`.

@@ -41,6 +41,13 @@ export default async function DownloadsPage() {
                         <pre className={styles.code}>{`docker pull ${b.docker_image}@${b.docker_digest}`}</pre>
 
                         <p className={styles.small}>
+                            Release page:{" "}
+                            <a href={b.github_release_url} target="_blank" rel="noreferrer">
+                                GitHub Releases
+                            </a>
+                        </p>
+
+                        <p className={styles.small}>
                             Quickstart anchor: <code>#{anchor}</code>
                         </p>
                     </section>

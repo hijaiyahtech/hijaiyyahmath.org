@@ -11,6 +11,7 @@ export type AuditorBundle = {
     sha256sums_url: string;
     docker_image: string;
     docker_digest: string;
+    github_release_url: string;
 };
 
 export async function loadAuditorBundles(): Promise<AuditorBundle[]> {

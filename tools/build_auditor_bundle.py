@@ -84,13 +84,19 @@ def tar_reproducible(bundle_dir: Path, out_tar: Path) -> None:
         ti.uname = ""
         ti.gname = ""
         ti.mtime = 0
-        # stable perms: keep file type default; do not force modes too aggressively
+        # executable perms for scripts/audit.sh
+        if ti.name.endswith("scripts/audit.sh"):
+            ti.mode = 0o755
+        else:
+            ti.mode = 0o644
         return ti
 
     with tarfile.open(out_tar, "w:gz") as tf:
         # Important: add folder as "AuditorBundle/..." inside tar
         base_name = bundle_dir.name
-        for p in iter_files(bundle_dir):
+        # Sort files for reproducibility
+        all_files = sorted(list(iter_files(bundle_dir)))
+        for p in all_files:
             rel = p.relative_to(bundle_dir).as_posix()
             arcname = f"{base_name}/{rel}"
             tf.add(p, arcname=arcname, recursive=False, filter=filter_tarinfo)

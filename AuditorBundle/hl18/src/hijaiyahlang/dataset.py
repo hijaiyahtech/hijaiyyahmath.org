@@ -51,6 +51,8 @@ def load_mh28_csv(path: str) -> Dataset18:
         table: Dict[str, List[int]] = {}
         for row in r:
             h = (row.get("letter") or "").strip()
+            # Strip tatweel/kashida from letter name
+            h = h.replace("\u0640", "")
             if not h or h == ".": continue # ignore empty or tail dots
             
             try:

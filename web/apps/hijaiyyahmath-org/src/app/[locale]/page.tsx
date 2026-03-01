@@ -62,34 +62,34 @@ curl http://localhost:3000/downloads/hgss/evidence.json`;
                 <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {[
                         {
-                            term: "HL-18 (HijaiyahLang)",
+                            term: "HL-18 (HijaiyyahLang)",
                             def: "Word-to-Vector (v18) audit engine and ground-truth implementation for the Hijaiyyah codex.",
                             audit: ["Release: HL-18-v1.0+local.1", "Normaliz Metric Validation", "Injective Mapping Audit"]
                         },
                         {
-                            term: "HISA",
-                            def: "Hijaiyyah Instruction Set Architecture: Audit-centric ISA for deterministic execution via HISA-VM.",
+                            term: "H-ISA (Hijaiyyah-Instruction Architecture)",
+                            def: "Audit-centric Instruction Set Architecture for deterministic execution via HISA-VM.",
                             audit: ["ISA Table Conformance", "Bit-exact IW Encoding", "Fail-closed TRAP Taxonomy"]
                         },
                         {
-                            term: "HCPU-AI",
-                            def: "Reference execution engine for stack compliance, integrating AI loops with HISA-VM delegation.",
-                            audit: ["Release: HCPU-AI-v1.0+local.1", "Regs: 18xV(u32), 8xR(u64)", "Modes: CORE/FEEDBACK/OWNER"]
-                        },
-                        {
-                            term: "HGSS-HCVM",
-                            def: "Deterministic crypto pipeline (HCVM) executing the security wrapper (HGSS) for evidence generation.",
-                            audit: ["Audit-grade deterministic VM", "Evidence-grade security wrapper", "Frozen Schema Validation"]
-                        },
-                        {
-                            term: "HC18DC",
-                            def: "Hijaiyyah Codex 18-Dimensional Canonical: The normative geometric artifact produced by the HGSS pipeline.",
-                            audit: ["Canonical CBOR Digest", "Deterministic Target Output", "Traceable Audit Artifact"]
-                        },
-                        {
-                            term: "HC-HCPU",
-                            def: "Physical implementation targets for HISA: Silicon microarchitecture, Photonic accelerators, or Qubit subsets.",
+                            term: "HCPU (Hijaiyyah Core Processing Unit)",
+                            def: "Deterministic compute module (Silicon/Photonic/Qubit) for H-ISA execution.",
                             audit: ["18-lane Silicon Datapath", "Photonic WDM Verification", "Reversible Qubit Subset"]
+                        },
+                        {
+                            term: "HCVM (Hijaiyyah Crypto Virtual Machine)",
+                            def: "Normative Virtual Machine for audit trail execution and evidence-grade integrity.",
+                            audit: ["Release: HISA-VM-v1.0+local.1", "Entropy-locked execution", "Deterministic TRAP logging"]
+                        },
+                        {
+                            term: "HGSS (Hijaiyyah Guarded Signature Scheme)",
+                            def: "Industrial AI harness with guarded repair loops and evidence generation.",
+                            audit: ["Release: HCPU-AI-v1.0+local.1", "Audit-grade deterministic VM", "Frozen Schema Validation"]
+                        },
+                        {
+                            term: "HC18DC (Hijaiyyah Codex 18-Dimensional Canonical) CSGI",
+                            def: "The normative geometric artifact and Canonical Skeleton Graph Interface (CSGI) implementation lock.",
+                            audit: ["Canonical CBOR Digest", "Skeletal Graph Γ(h) Lock", "Traceable Audit Artifact"]
                         },
                     ].map((item, i) => (
                         <div key={i} className="rounded-xl border bg-white p-4 dark:bg-gray-900 dark:border-gray-800 flex flex-col">

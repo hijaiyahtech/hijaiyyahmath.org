@@ -24,22 +24,25 @@ export default async function AuditorQuickstartPage() {
                         </p>
 
                         <h3 className={styles.h2}>A) Offline: .tar.gz + venv</h3>
-                        <pre className={styles.code}>{`# 1) Verify tarball hash (compare with /downloads)
-sha256sum ${b.tar_url.split("/").pop() ?? "BUNDLE.tar.gz"}
+                        <pre className={styles.code}>{`# 1) Download from GitHub Releases
+curl -L -o bundle.tar.gz "${b.tar_url}"
 
-# 2) Extract
-tar -xzf ${b.tar_url.split("/").pop() ?? "BUNDLE.tar.gz"}
+# 2) Verify tarball SHA-256 (compare with /downloads)
+sha256sum bundle.tar.gz
+
+# 3) Extract
+tar -xzf bundle.tar.gz
 cd AuditorBundle
 
-# 3) Create venv
+# 4) Create venv
 python3 -m venv .venv
 . .venv/bin/activate
 
-# 4) Install deps (locked) + install HL-18
+# 5) Install deps (locked) + install HL-18
 pip install -r requirements.lock.txt
 pip install -e hl18
 
-# 5) Full verification (PASS + CORE-1 TRAP)
+# 6) Full verification (PASS + CORE-1 TRAP)
 python scripts/verify_all.py
 `}</pre>
 

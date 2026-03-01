@@ -1,8 +1,14 @@
 import argparse, json, os, sys
 from typing import Any, Dict, List
+from pathlib import Path
 
 from hijaiyahlang.dataset import load_mh28_csv, cod_word
 from hijaiyahlang.core import audit_v18, mod18
+from hijaiyahlang.release import load_release
+from hijaiyahlang.hisa_config import load_hisa_integration_spec
+from hijaiyahlang.hisa_bridge import HISAVMRunner, write_master_overlay_28, index_of_letter
+from hijaiyahlang.normalize import normalize_letter_id
+from hijaiyahlang.engine import encode_text
 
 def main() -> None:
     # Ensure UTF-8 output for Hijaiyah characters

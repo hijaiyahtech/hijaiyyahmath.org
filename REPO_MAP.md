@@ -1,6 +1,6 @@
-# REPO MAP — Hijaiyah-Codex
+# REPO MAP — Hijaiyyah-Codex
 
-This document maps the relationships between assets and modules in the `hijaiyah-codex` ecosystem.
+This document maps the relationships between assets and modules in the `hijaiyyah-codex` ecosystem.
 
 ## 1. Data Flow Architecture
 The system follows a strict pipeline from visual glyphs to audit-grade reports:

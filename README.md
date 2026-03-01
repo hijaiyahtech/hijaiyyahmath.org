@@ -1,11 +1,11 @@
-# Hijaiyah-Codex Monorepo
+# Hijaiyyah-Codex Monorepo
 
-Welcome to the **Hijaiyah-Codex** monorepo. This project is a consolidated environment for the research, development, and audit of Hijaiyah-based cryptographic and AI systems.
+Welcome to the **Hijaiyyah-Codex** monorepo. This project is a consolidated environment for the research, development, and audit of Hijaiyyah-based cryptographic and AI systems.
 
 ## 0. Project Modules
-- [hijaiyahlang-hl18](./hijaiyahlang-hl18): Core language processing and glyph features.
-- [hisa-vm](./hisa-vm): Normative Virtual Machine for audit trail execution.
-- [hgss-hc18dc](./hgss-hc18dc): Normative Oracle and evidence verification suite.
+- [hijaiyahlang-hl18](./hijaiyahlang-hl18): HL-18 (HijaiyyahLang) — Core language processing and glyph features.
+- [hisa-vm](./hisa-vm): HCVM (Hijaiyyah Crypto Virtual Machine) — Normative Virtual Machine for audit trail execution.
+- [hgss-hc18dc](./hgss-hc18dc): HGSS & HC18DC — Normative Oracle and evidence verification suite.
 - [hijaiyyah-ai-hgss](./hijaiyyah-ai-hgss): Industrial AI harness with guarded repair loops.
 - [cmm18c](./cmm18c): Mathematical models and RTL specifications.
 - [glyph/](./glyph): Normative SVG/PNG assets.

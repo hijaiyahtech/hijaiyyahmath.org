@@ -1,0 +1,63 @@
+name: Release Auditor Bundle
+
+on:
+  push:
+    tags:
+      - "stack-v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install pyyaml pytest
+          pip install -e AuditorBundle/hl18
+          pip install -e AuditorBundle/hisa-vm
+
+      - name: Verify Bundle (Dry-Run)
+        run: |
+          # Use local verification script to ensure bundle is valid before release
+          export PYTHONPATH=$PYTHONPATH:$PWD/AuditorBundle/hl18/src:$PWD/AuditorBundle/hisa-vm/src
+          python3 AuditorBundle/scripts/verify_all.py
+
+      - name: Build Bundle Artifacts
+        id: build
+        run: |
+          # Extract bundle ID from RELEASE_ID.json
+          BUNDLE_ID=$(python3 -c "import json; print(json.load(open('AuditorBundle/RELEASE_ID.json'))['bundle_id'])")
+          echo "bundle_id=$BUNDLE_ID" >> $GITHUB_OUTPUT
+          
+          python3 tools/build_auditor_bundle.py \
+            --bundle-id "$BUNDLE_ID"
+
+      - name: Update Release Manifest
+        run: |
+          python3 scripts/update_release_manifest.py
+
+      - name: Commit manifest update
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add web/apps/hijaiyyahmath-org/public/releases/auditor_bundles.json
+          git commit -m "docs: update auditor bundle manifest for ${{ steps.build.outputs.bundle_id }}" || echo "No changes to commit"
+          git push origin HEAD:main
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/SHA256SUMS.txt
